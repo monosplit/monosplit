@@ -11,10 +11,12 @@ import java.util.Set;
 public class ProjectCopier {
     private File newDir;
     private Set<String> includeController;
+    private boolean removeContained;
 
-    ProjectCopier(String directory, Set<String> includeController) throws IOException {
+    ProjectCopier(String directory, String newSubDir, Set<String> includeController, boolean removeContained) throws IOException {
         this.includeController = includeController;
-        newDir = new File(directory, "../app1");
+        newDir = new File(directory, newSubDir);
+        this.removeContained = removeContained;
         FileUtils.copyDirectory(new File(directory), newDir);
     }
 
@@ -30,7 +32,7 @@ public class ProjectCopier {
 
     private void checkAndRemoveFile(File file) {
         String fileNameWithoutConvention = FileNameUtils.getAlphaNumericPath(file.getName());
-        if(!includeController.contains(fileNameWithoutConvention)) file.delete();
+        if(includeController.contains(fileNameWithoutConvention) ^ removeContained) file.delete();
     }
 
 }
