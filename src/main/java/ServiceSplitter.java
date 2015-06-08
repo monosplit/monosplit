@@ -1,6 +1,4 @@
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by sarp on 7/06/15.
@@ -24,7 +22,7 @@ public class ServiceSplitter {
 
     public Set<String> getControllerFiles(List<String> controllers) {
         Set<String> controllerFiles = new HashSet<>();
-        controllers.forEach((controller) -> controllerFiles.add(getAlphaNumericPath(controller)));
+        controllers.forEach((controller) -> controllerFiles.add(FileNameUtils.getAlphaNumericPath(controller)));
         return controllerFiles;
     }
 
@@ -50,14 +48,6 @@ public class ServiceSplitter {
     private String splitURI(String uri) {
         String[] uriArr = uri.split("/");
         if (uriArr.length < 1) return null;
-        return getAlphaNumericPath(uriArr[1]);
-    }
-
-    private String getAlphaNumericPath(String path) {
-        Matcher nonAlphaNumeric = Pattern.compile("\\W+").matcher(path);
-        if (nonAlphaNumeric.find()) {
-            return path.substring(0, nonAlphaNumeric.start());
-        }
-        return path;
+        return FileNameUtils.getAlphaNumericPath(uriArr[1]);
     }
 }

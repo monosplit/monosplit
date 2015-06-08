@@ -17,5 +17,6 @@ public class MonoSplit {
         //controllers.forEach((con) -> System.out.println(con));
         Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
         controllerFiles.forEach((con) -> System.out.println(con));
+        ProjectCopier projectCopier = new ProjectCopier(args[0], controllerFiles).apply();
     }
 }
