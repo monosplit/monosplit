@@ -14,22 +14,15 @@ public class CommandRunner {
     }
 
     public void runCommandLine(String directory) throws IOException {
-        Thread commandLineThread = new Thread(() -> {
-            try {
-                ProcessBuilder processBuilder = new ProcessBuilder(
-                        "/bin/bash");
-                processBuilder.directory(new File(directory));
-                Process process = processBuilder.start();
-                try (OutputStreamWriter osw = new OutputStreamWriter(process.getOutputStream())) {
-                    osw.write(command);
-                }
-                printStream(process.getErrorStream(), true); //ToDo configure error logger and make this warning
-                printStream(process.getInputStream(), true);
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        });
-        commandLineThread.start();
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "/bin/bash");
+        processBuilder.directory(new File(directory));
+        Process process = processBuilder.start();
+        try (OutputStreamWriter osw = new OutputStreamWriter(process.getOutputStream())) {
+            osw.write(command);
+        }
+        printStream(process.getErrorStream(), true); //ToDo configure error logger and make this warning
+        printStream(process.getInputStream(), true);
     }
 
 
