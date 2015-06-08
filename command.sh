@@ -1,1 +1,1 @@
-rails server -b ${monosplit.ip} -p ${monosplit.port} -e development
+nohup rails server -b ${monosplit.ip} -p ${monosplit.port} -e development
