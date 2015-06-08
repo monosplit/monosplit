@@ -17,7 +17,9 @@ public class MonoSplit {
         //controllers.forEach((con) -> System.out.println(con));
         Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
         controllerFiles.forEach((con) -> System.out.println(con));
-        ProjectCopier firstService = new ProjectCopier(args[0], "../app1", controllerFiles, true).apply();
-        ProjectCopier lastService = new ProjectCopier(args[0], "../app0", controllerFiles, false).apply();
+        ProjectCopier firstService = new ProjectCopier(args[0], "../app1", controllerFiles, true).setIP("0.0.0.0").setPort(3001).applyProjectSettings();
+        ProjectCopier lastService = new ProjectCopier(args[0], "../app0", controllerFiles, false).setIP("0.0.0.0").setPort(3002).applyProjectSettings();
+        firstService.runProjectCommand();
+        lastService.runProjectCommand();
     }
 }

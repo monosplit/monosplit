@@ -22,7 +22,6 @@ public class ParseRails extends LanguageParser {
         Process process = processBuilder.start();
         printStream(process.getErrorStream(), true); //ToDo configure error logger and make this warning
         stringToMap(printStream(process.getInputStream(), false));
-
     }
 
     private void stringToMap(List<String> routeLines) {
