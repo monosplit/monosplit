@@ -14,16 +14,25 @@ import java.util.Set;
 public class ProjectCopier {
     private File newDir;
     private Set<String> includeController;
-    private boolean removeContained;
+    private boolean isRemainingServices;
     private String ip = "0.0.0.0";
     private Integer port = 3000;
     private Set<String> mandatoryFiles = new HashSet<>(Arrays.asList("application_controller.rb")); //Temporary, build it with Language Parser
 
-    ProjectCopier(String directory, String newSubDir, Set<String> includeController, boolean removeContained) throws IOException {
+    ProjectCopier(String directory, String newSubDir, Set<String> includeController, boolean isRemainingServices) throws IOException {
         this.includeController = includeController;
         newDir = new File(directory, newSubDir);
-        this.removeContained = removeContained;
+        this.isRemainingServices = isRemainingServices;
         FileUtils.copyDirectory(new File(directory), newDir);
+    }
+
+    public Set<String> getServingEndPoints() {
+        Set<String> endPoints = new HashSet<>();
+        return endPoints;
+    }
+
+    public boolean isRemainingServices() {
+        return isRemainingServices;
     }
 
     public ProjectCopier applyProjectSettings() {
@@ -60,7 +69,7 @@ public class ProjectCopier {
 
     private void checkAndRemoveFile(File file) {
         String fileNameWithoutConvention = FileNameUtils.getAlphaNumericPath(file.getName());
-        if((includeController.contains(fileNameWithoutConvention) ^ removeContained)
+        if((!includeController.contains(fileNameWithoutConvention) ^ isRemainingServices)
                 && !mandatoryFiles.contains(file.getName())) file.delete();
     }
 

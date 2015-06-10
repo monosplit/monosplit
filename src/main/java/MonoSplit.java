@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
 
@@ -17,9 +18,11 @@ public class MonoSplit {
         //controllers.forEach((con) -> System.out.println(con));
         Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
         controllerFiles.forEach((con) -> System.out.println(con));
-        ProjectCopier firstService = new ProjectCopier(args[0], "../app1", controllerFiles, true).setIP("0.0.0.0").setPort(3001).applyProjectSettings();
-        ProjectCopier lastService = new ProjectCopier(args[0], "../app0", controllerFiles, false).setIP("0.0.0.0").setPort(3002).applyProjectSettings();
+        ProjectCopier lastService = new ProjectCopier(args[0], "../app0", controllerFiles, true).setIP("0.0.0.0").setPort(3000).applyProjectSettings();
+        ProjectCopier firstService = new ProjectCopier(args[0], "../app1", controllerFiles, false).setIP("0.0.0.0").setPort(3001).applyProjectSettings();
         firstService.runProjectCommand();
         lastService.runProjectCommand();
+        ProxyConfigurator proxyConfigurator = new ProxyConfigurator().addProjectToProxy(firstService).addProjectToProxy(lastService);
+        //proxyConfigurator.saveAndDeployProxy();
     }
 }
