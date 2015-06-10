@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -16,6 +17,7 @@ public class ProjectCopier {
     private boolean removeContained;
     private String ip = "0.0.0.0";
     private Integer port = 3000;
+    private Set<String> mandatoryFiles = new HashSet<>(Arrays.asList("application_controller.rb")); //Temporary, build it with Language Parser
 
     ProjectCopier(String directory, String newSubDir, Set<String> includeController, boolean removeContained) throws IOException {
         this.includeController = includeController;
@@ -58,7 +60,8 @@ public class ProjectCopier {
 
     private void checkAndRemoveFile(File file) {
         String fileNameWithoutConvention = FileNameUtils.getAlphaNumericPath(file.getName());
-        if(includeController.contains(fileNameWithoutConvention) ^ removeContained) file.delete();
+        if((includeController.contains(fileNameWithoutConvention) ^ removeContained)
+                && !mandatoryFiles.contains(file.getName())) file.delete();
     }
 
 }
