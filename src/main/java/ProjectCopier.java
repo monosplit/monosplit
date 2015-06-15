@@ -16,6 +16,7 @@ public class ProjectCopier {
     private Set<String> includeController;
     private boolean isRemainingServices;
     private String ip = "0.0.0.0";
+    private String endPointURI;
     private Integer port = 3000;
     private Set<String> mandatoryFiles = new HashSet<>(Arrays.asList("application_controller.rb")); //Temporary, build it with Language Parser
 
@@ -47,6 +48,11 @@ public class ProjectCopier {
 
     public ProjectCopier setPort(Integer port) {
         this.port = port;
+        return this;
+    }
+
+    public ProjectCopier setEndPoint(String uri) {
+        this.endPointURI = uri;
         return this;
     }
 

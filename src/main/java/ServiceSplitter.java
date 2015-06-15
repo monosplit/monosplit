@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by sarp on 7/06/15.
@@ -17,6 +19,22 @@ public class ServiceSplitter {
     public List<String> getControllersFromURI(String uri, LanguageParser parsedRoute) {
         List<String> controllers = new ArrayList<>();
         parsedRoute.getUriControllerAction().forEach((path, controller) -> addControllerToList(controllers, controller, compareURIs(uri, path)));
+        return controllers;
+    }
+
+    public Set<String> getRemainingControllersFromURI(String uri, LanguageParser parsedRoute) {
+        System.out.println(uri);
+        Set<String> controllers = new HashSet<>();
+        Set<String> usedControllers = parsedRoute.getUriControllerAction().entrySet().parallelStream()
+                .filter((entry) -> entry.getKey().substring(1).startsWith(uri))
+                .map(entry -> FileNameUtils.getAlphaNumericPath(entry.getValue()))
+                .collect(Collectors.toSet());
+
+        Map<String, String> notUsedURI = parsedRoute.getUriControllerAction().entrySet().parallelStream()
+                .filter((entry) -> usedControllers.contains(FileNameUtils.getAlphaNumericPath(entry.getValue())) && !entry.getKey().substring(1).startsWith(uri))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+        //add notUsedURI's key to somewhere which will be used in ProjectCopier
         return controllers;
     }
 

@@ -18,10 +18,14 @@ public class MonoSplit {
         //controllers.forEach((con) -> System.out.println(con));
         Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
         controllerFiles.forEach((con) -> System.out.println(con));
-        ProjectCopier lastService = new ProjectCopier(args[0], "../app0", controllerFiles, true).setIP("0.0.0.0").setPort(3000).applyProjectSettings();
-        ProjectCopier firstService = new ProjectCopier(args[0], "../app1", controllerFiles, false).setIP("0.0.0.0").setPort(3001).applyProjectSettings();
+
+        ProjectCopier firstService = new ProjectCopier(args[0], "../app1", controllerFiles, false).
+                setIP("0.0.0.0").setPort(3001).setEndPoint(firstUri).applyProjectSettings();
         firstService.runProjectCommand();
+        serviceSplitter.getRemainingControllersFromURI(firstUri, rails);
+        ProjectCopier lastService = new ProjectCopier(args[0], "../app0", controllerFiles, true).setIP("0.0.0.0").setPort(3000).applyProjectSettings();
         lastService.runProjectCommand();
+
         ProxyConfigurator proxyConfigurator = new ProxyConfigurator().addProjectToProxy(firstService).addProjectToProxy(lastService);
         //proxyConfigurator.saveAndDeployProxy();
     }
