@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -17,12 +19,15 @@ public class MonoSplit {
         List<String> controllers = serviceSplitter.getControllersFromURI(firstUri, rails);
         //controllers.forEach((con) -> System.out.println(con));
         Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
-        controllerFiles.forEach((con) -> System.out.println(con));
+       // controllerFiles.forEach((con) -> System.out.println(con));
 
         ProjectCopier firstService = new ProjectCopier(args[0], "../app1", controllerFiles, false).
                 setIP("0.0.0.0").setPort(3001).setEndPoint(firstUri).applyProjectSettings();
         firstService.runProjectCommand();
-        serviceSplitter.getRemainingControllersFromURI(firstUri, rails);
+
+        Map<String,String> remainingUriControllers = serviceSplitter.getRemainingControllersFromURI(firstUri, rails);
+        remainingUriControllers.forEach((uri, controller) -> controllerFiles.remove(controller)); //Should check if uri is not used when multiple uri services are used
+
         ProjectCopier lastService = new ProjectCopier(args[0], "../app0", controllerFiles, true).setIP("0.0.0.0").setPort(3000).applyProjectSettings();
         lastService.runProjectCommand();
 

@@ -22,20 +22,15 @@ public class ServiceSplitter {
         return controllers;
     }
 
-    public Set<String> getRemainingControllersFromURI(String uri, LanguageParser parsedRoute) {
-        System.out.println(uri);
-        Set<String> controllers = new HashSet<>();
+    public Map<String, String> getRemainingControllersFromURI(String uri, LanguageParser parsedRoute) {
         Set<String> usedControllers = parsedRoute.getUriControllerAction().entrySet().parallelStream()
                 .filter((entry) -> entry.getKey().substring(1).startsWith(uri))
                 .map(entry -> FileNameUtils.getAlphaNumericPath(entry.getValue()))
                 .collect(Collectors.toSet());
 
-        Map<String, String> notUsedURI = parsedRoute.getUriControllerAction().entrySet().parallelStream()
+        return parsedRoute.getUriControllerAction().entrySet().parallelStream()
                 .filter((entry) -> usedControllers.contains(FileNameUtils.getAlphaNumericPath(entry.getValue())) && !entry.getKey().substring(1).startsWith(uri))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        //add notUsedURI's key to somewhere which will be used in ProjectCopier
-        return controllers;
+                .collect(Collectors.toMap(e -> FileNameUtils.getAlphaNumericPath(e.getKey().substring(1)), e -> FileNameUtils.getAlphaNumericPath(e.getValue())));
     }
 
     public Set<String> getControllerFiles(List<String> controllers) {
