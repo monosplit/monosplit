@@ -10,6 +10,11 @@ import java.nio.file.Paths;
 public class ProxyConfigurator {
     private String proxyContent;
 
+    private static final String MONOSPLIT_BLOCK = "${monosplit.beginconfig}";
+
+    private StringBuilder frontEndAddition = new StringBuilder();
+    private StringBuilder backEndAddition = new StringBuilder();
+
     ProxyConfigurator() throws IOException {
         proxyContent = new String(Files.readAllBytes(Paths.get("haproxy.cfg")));
     }
@@ -24,15 +29,38 @@ public class ProxyConfigurator {
     }
 
     public void saveAndDeployProxy() throws IOException {
+        processAdditions();
         FileUtils.writeStringToFile(Paths.get("generatedproxy.cfg").toFile(), proxyContent, "UTF-8");
         String commandContent = new String(Files.readAllBytes(Paths.get("proxydeploy.sh")));
         CommandRunner commandRunner = new CommandRunner(commandContent);
-        commandRunner.runCommandLine(Paths.get("").toAbsolutePath().toString());
+        //commandRunner.runCommandLine(Paths.get("").toAbsolutePath().toString());
+    }
+
+    private void processAdditions() {
+        int blockIndex = proxyContent.indexOf(MONOSPLIT_BLOCK) + MONOSPLIT_BLOCK.length();
+        StringBuilder content = new StringBuilder();
+        content.append(proxyContent.substring(0, blockIndex));
+        content.append(frontEndAddition);
+        content.append(backEndAddition);
+        content.append(proxyContent.substring(blockIndex));
+        proxyContent = content.toString();
     }
 
     private void addEndPoints(ProjectCopier projectCopier) {
     }
 
     private void setDefaultBackEnd(ProjectCopier projectCopier) {
+        frontEndAddition.append(System.getProperty("line.separator"));
+        frontEndAddition.append("default_backend remaining_backend");
+
+        backEndAddition.append(System.getProperty("line.separator"));
+        backEndAddition.append("backend remaining_backend");
+        backEndAddition.append(System.getProperty("line.separator"));
+        backEndAddition.append("server remainingserv ");
+        backEndAddition.append(projectCopier.getIp());
+        backEndAddition.append(":");
+        backEndAddition.append(projectCopier.getPort());
+        backEndAddition.append(" check");
+
     }
 }

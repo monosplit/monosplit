@@ -30,6 +30,6 @@ public class MonoSplit {
         lastService.runProjectCommand();
 
         ProxyConfigurator proxyConfigurator = new ProxyConfigurator().addProjectToProxy(firstService).addProjectToProxy(lastService);
-        //proxyConfigurator.saveAndDeployProxy();
+        proxyConfigurator.saveAndDeployProxy();
     }
 }

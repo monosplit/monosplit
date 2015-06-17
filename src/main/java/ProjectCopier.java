@@ -36,6 +36,14 @@ public class ProjectCopier {
         return isRemainingServices;
     }
 
+    public String getIp() {
+        return ip;
+    }
+
+    public Integer getPort() {
+        return port;
+    }
+
     public ProjectCopier applyProjectSettings() {
         removeControllers();
         return this;
