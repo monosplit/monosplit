@@ -27,9 +27,8 @@ public class ProjectCopier {
         FileUtils.copyDirectory(new File(directory), newDir);
     }
 
-    public Set<String> getServingEndPoints() {
-        Set<String> endPoints = new HashSet<>();
-        return endPoints;
+    public String getEndPointURI() {
+        return endPointURI;
     }
 
     public boolean isRemainingServices() {

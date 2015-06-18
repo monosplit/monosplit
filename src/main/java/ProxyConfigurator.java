@@ -33,7 +33,7 @@ public class ProxyConfigurator {
         FileUtils.writeStringToFile(Paths.get("generatedproxy.cfg").toFile(), proxyContent, "UTF-8");
         String commandContent = new String(Files.readAllBytes(Paths.get("proxydeploy.sh")));
         CommandRunner commandRunner = new CommandRunner(commandContent);
-        //commandRunner.runCommandLine(Paths.get("").toAbsolutePath().toString());
+        commandRunner.runCommandLine(Paths.get("").toAbsolutePath().toString());
     }
 
     private void processAdditions() {
@@ -47,6 +47,29 @@ public class ProxyConfigurator {
     }
 
     private void addEndPoints(ProjectCopier projectCopier) {
+        frontEndAddition.append(System.getProperty("line.separator"));
+        frontEndAddition.append("acl ");
+        frontEndAddition.append(projectCopier.getEndPointURI());
+        frontEndAddition.append(" path_beg -i /");
+        frontEndAddition.append(projectCopier.getEndPointURI());
+        frontEndAddition.append(System.getProperty("line.separator"));
+        frontEndAddition.append("use_backend ");
+        frontEndAddition.append(projectCopier.getEndPointURI());
+        frontEndAddition.append("_backend if ");
+        frontEndAddition.append(projectCopier.getEndPointURI());
+
+        backEndAddition.append(System.getProperty("line.separator"));
+        backEndAddition.append("backend ");
+        backEndAddition.append(projectCopier.getEndPointURI());
+        backEndAddition.append("_backend");
+        backEndAddition.append(System.getProperty("line.separator"));
+        backEndAddition.append("server ");
+        backEndAddition.append(projectCopier.getEndPointURI());
+        backEndAddition.append("serv ");
+        backEndAddition.append(projectCopier.getIp());
+        backEndAddition.append(":");
+        backEndAddition.append(projectCopier.getPort());
+        backEndAddition.append(" check");
     }
 
     private void setDefaultBackEnd(ProjectCopier projectCopier) {
