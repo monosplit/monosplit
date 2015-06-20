@@ -10,7 +10,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Created by sarp on 4/06/15.
+ * Created by sarp on 4/06/15
+ * This is psvm class takes the first argument as config.yaml file
  */
 public class MonoSplit {
 
@@ -23,7 +24,7 @@ public class MonoSplit {
 
         ServiceSplitter serviceSplitter = new ServiceSplitter(rails);
 
-        List<ProjectCopier> mServices = monoSplit.splitServicesForTheGivenAmount((short) 1, serviceSplitter, rails, projectConfig);
+        List<ProjectCopier> mServices = monoSplit.splitServicesForTheGivenAmount(projectConfig.getMicroServiceAmount(), serviceSplitter, rails, projectConfig);
 
         Set<String> allUsedControllers = monoSplit.completelyUsedControllers(mServices, serviceSplitter, rails);
         mServices.add(monoSplit.configureDefaultService(projectConfig, allUsedControllers));
@@ -41,7 +42,7 @@ public class MonoSplit {
 
 
     public ProjectCopier configureDefaultService(Config projectConfig, Set<String> controllerFiles) throws IOException {
-        return new ProjectCopier(projectConfig.getProjectPath(), projectConfig.getProjectPath() + "0", controllerFiles, true)
+        return new ProjectCopier(projectConfig.getProjectPath(), projectConfig.getCopyFolderPrefix() + "0", controllerFiles, true)
                 .setIP(projectConfig.getIpAddress()).setPort(projectConfig.getBasePortNumber());
     }
 
@@ -71,6 +72,9 @@ public class MonoSplit {
 
     public void runAllMicroServices(List<ProjectCopier> services) throws IOException {
         for (ProjectCopier service : services) {
+            String endpointName = service.getEndPointURI();
+            endpointName = endpointName == null ? "Remaining services" : endpointName;
+            System.out.println("Running " + endpointName);
             service.applyProjectSettings().runProjectCommand();
         }
     }

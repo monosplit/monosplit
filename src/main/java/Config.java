@@ -6,6 +6,15 @@ public class Config {
     private String copyFolderPrefix;
     private String ipAddress;
     private Short basePortNumber;
+    private Short microServiceAmount;
+
+    public Short getMicroServiceAmount() {
+        return microServiceAmount;
+    }
+
+    public void setMicroServiceAmount(Short microServiceAmount) {
+        this.microServiceAmount = microServiceAmount;
+    }
 
     public String getProjectPath() {
         return projectPath;
