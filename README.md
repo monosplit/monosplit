@@ -34,6 +34,43 @@ This is the configuration file for HAProxy, configure everything you want in you
 ### proxydeploy.sh
 This is the shell script for deploying the HAProxy settings, always make sure that you are copying `generatedproxy.cfg` file to the HAProxy's configuration directory and then restart HAProxy.
 
+## How does it work?
+
+MonoSplit takes your monolithic web appliccation, then checks it's routing table, then starts splitting into micro services by the highest amount of endpoints available. The below is the demo's routing table:
+```
+        Prefix Verb   URI Pattern                    Controller#Action
+          root GET    /                              static_pages#home
+following_user GET    /users/:id/following(.:format) users#following
+followers_user GET    /users/:id/followers(.:format) users#followers
+         users GET    /users(.:format)               users#index
+               POST   /users(.:format)               users#create
+      new_user GET    /users/new(.:format)           users#new
+     edit_user GET    /users/:id/edit(.:format)      users#edit
+          user GET    /users/:id(.:format)           users#show
+               PATCH  /users/:id(.:format)           users#update
+               PUT    /users/:id(.:format)           users#update
+               DELETE /users/:id(.:format)           users#destroy
+      sessions POST   /sessions(.:format)            sessions#create
+   new_session GET    /sessions/new(.:format)        sessions#new
+       session DELETE /sessions/:id(.:format)        sessions#destroy
+        tweets GET    /tweets(.:format)              tweets#index
+               POST   /tweets(.:format)              tweets#create
+         tweet DELETE /tweets/:id(.:format)          tweets#destroy
+ relationships POST   /relationships(.:format)       relationships#create
+  relationship DELETE /relationships/:id(.:format)   relationships#destroy
+        signup GET    /signup(.:format)              users#new
+        signin GET    /signin(.:format)              sessions#new
+       signout DELETE /signout(.:format)             sessions#destroy
+         about GET    /about(.:format)               static_pages#about
+                      /*path(.:format)               application#routing_error
+```
+
+In the example above, first microservice candidate would be the `/users` endpoint, because this endpoint has the most entries, then it will go by `/sessions` and so on. Each of the created micro services only contain their corresponding controller.
+
+After these microservices created, their deployment script will be run by MonoSplit. Once all microservices are deployed, HAProxy configuration will be set and deployed as well.
+
+Currently MonoSplit only supports Ruby on Rails framework, more language/framework support will be added.
+
 
 ## Known issues:
  -No file based databases that are only available within the project itself. As your codebase is split, the whole project will be copied into another directory. So any project directory based file changes will not be detected/used by the other services. In short, make sure your existing database changes can be done anywhere from the system without changing any configuration (such as databases accesible over IP or full path of the database file)
