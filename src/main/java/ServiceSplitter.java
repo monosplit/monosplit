@@ -25,12 +25,12 @@ public class ServiceSplitter {
     public Map<String, Set<String>> getRemainingControllerFilesFromURI(String uri, LanguageParser parsedRoute) {
         Set<String> usedControllers = uriToControllerFiles(parsedRoute).entrySet().parallelStream()
                 .filter((entry) -> entry.getKey().substring(1).startsWith(uri))
-                .map(entry -> entry.getValue())
+                .map(Map.Entry::getValue)
                 .collect(Collectors.toSet());
 
         return uriToControllerFiles(parsedRoute).entrySet().parallelStream()
                 .filter((entry) -> usedControllers.contains(entry.getValue()) && !entry.getKey().substring(1).startsWith(uri))
-                .collect(Collectors.groupingBy(e -> e.getValue(),
+                .collect(Collectors.groupingBy(Map.Entry::getValue,
                         Collectors.mapping(e -> FileNameUtils.getAlphaNumericPath(e.getKey().substring(1)), Collectors.toSet())));
     }
 

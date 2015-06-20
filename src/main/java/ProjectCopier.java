@@ -81,7 +81,7 @@ public class ProjectCopier {
 
     private void removeControllers() {
         File controllerDir = new File(newDir, "app/controllers");
-        Arrays.asList(controllerDir.listFiles()).forEach((file) -> checkAndRemoveFile(file));
+        Arrays.asList(controllerDir.listFiles()).forEach(this::checkAndRemoveFile);
     }
 
     private void checkAndRemoveFile(File file) {
