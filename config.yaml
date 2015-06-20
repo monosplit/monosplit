@@ -1,1 +1,4 @@
 projectPath: /home/sarp/dev/Rails-4-Twitter-Clone
+copyFolderPrefix: ../app
+ipAddress: 0.0.0.0
+basePortNumber: 3000

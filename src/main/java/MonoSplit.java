@@ -15,24 +15,25 @@ public class MonoSplit {
     public static void main(String[] args) throws IOException {
         Yaml yaml = new Yaml();
         Config projectConfig = yaml.loadAs(new String(Files.readAllBytes(Paths.get(args[0]))), Config.class);
+
         System.out.println("Running the command on " + projectConfig.getProjectPath());
         LanguageParser rails = new ParseRails(projectConfig.getProjectPath());
-        ServiceSplitter serviceSplitter = new ServiceSplitter(rails);
-        //serviceSplitter.getSortedUri().forEach((uri) -> System.out.println(uri));
-        String firstUri = serviceSplitter.getSortedUri().get(0);
-        List<String> controllers = serviceSplitter.getControllersFromURI(firstUri, rails);
-        //controllers.forEach((con) -> System.out.println(con));
-        Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
-       // controllerFiles.forEach((con) -> System.out.println(con));
 
-        ProjectCopier firstService = new ProjectCopier(projectConfig.getProjectPath(), "../app1", controllerFiles, false).
-                setIP("0.0.0.0").setPort(3001).setEndPoint(firstUri).applyProjectSettings();
+        ServiceSplitter serviceSplitter = new ServiceSplitter(rails);
+        String firstUri = serviceSplitter.getSortedUri().get(0);
+
+        List<String> controllers = serviceSplitter.getControllersFromURI(firstUri, rails);
+        Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
+
+        ProjectCopier firstService = new ProjectCopier(projectConfig.getProjectPath(), projectConfig.getProjectPath() + "1", controllerFiles, false)
+                .setIP(projectConfig.getIpAddress()).setPort((short)(projectConfig.getBasePortNumber()+1)).setEndPoint(firstUri).applyProjectSettings();
         firstService.runProjectCommand();
 
-        Map<String,String> remainingUriControllers = serviceSplitter.getRemainingControllersFromURI(firstUri, rails);
+        Map<String, String> remainingUriControllers = serviceSplitter.getRemainingControllersFromURI(firstUri, rails);
         remainingUriControllers.forEach((uri, controller) -> controllerFiles.remove(controller)); //Should check if uri is not used when multiple uri services are used
 
-        ProjectCopier lastService = new ProjectCopier(projectConfig.getProjectPath(), "../app0", controllerFiles, true).setIP("0.0.0.0").setPort(3000).applyProjectSettings();
+        ProjectCopier lastService = new ProjectCopier(projectConfig.getProjectPath(), projectConfig.getProjectPath() + "0", controllerFiles, true)
+                .setIP(projectConfig.getIpAddress()).setPort(projectConfig.getBasePortNumber()).applyProjectSettings();
         lastService.runProjectCommand();
 
         ProxyConfigurator proxyConfigurator = new ProxyConfigurator().addProjectToProxy(firstService).addProjectToProxy(lastService);

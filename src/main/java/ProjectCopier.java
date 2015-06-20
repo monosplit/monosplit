@@ -17,7 +17,7 @@ public class ProjectCopier {
     private boolean isRemainingServices;
     private String ip = "0.0.0.0";
     private String endPointURI;
-    private Integer port = 3000;
+    private Short port = 0;
     private Set<String> mandatoryFiles = new HashSet<>(Arrays.asList("application_controller.rb")); //Temporary, build it with Language Parser
 
     ProjectCopier(String directory, String newSubDir, Set<String> includeController, boolean isRemainingServices) throws IOException {
@@ -39,7 +39,7 @@ public class ProjectCopier {
         return ip;
     }
 
-    public Integer getPort() {
+    public Short getPort() {
         return port;
     }
 
@@ -53,7 +53,7 @@ public class ProjectCopier {
         return this;
     }
 
-    public ProjectCopier setPort(Integer port) {
+    public ProjectCopier setPort(Short port) {
         this.port = port;
         return this;
     }
