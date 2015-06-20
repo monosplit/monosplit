@@ -11,6 +11,7 @@ public class ServiceSplitter {
     public ServiceSplitter(LanguageParser parsedRoute) {
         Map<String, Integer> uriCount = new HashMap<>();
         parsedRoute.getUriControllerAction().forEach((uri, controller) -> countURI(splitURI(uri), uriCount));
+        uriCount.remove("");//Remove root
         sortedUri = new ArrayList<>();
         uriCount.entrySet().stream().sorted(Collections.reverseOrder(Map.Entry.comparingByValue())).forEach((uri) -> sortedUri.add(uri.getKey()));
     }
@@ -21,15 +22,16 @@ public class ServiceSplitter {
         return controllers;
     }
 
-    public Map<String, String> getRemainingControllersFromURI(String uri, LanguageParser parsedRoute) {
-        Set<String> usedControllers = parsedRoute.getUriControllerAction().entrySet().parallelStream()
+    public Map<String, Set<String>> getRemainingControllerFilesFromURI(String uri, LanguageParser parsedRoute) {
+        Set<String> usedControllers = uriToControllerFiles(parsedRoute).entrySet().parallelStream()
                 .filter((entry) -> entry.getKey().substring(1).startsWith(uri))
-                .map(entry -> FileNameUtils.getAlphaNumericPath(entry.getValue()))
+                .map(entry -> entry.getValue())
                 .collect(Collectors.toSet());
 
-        return parsedRoute.getUriControllerAction().entrySet().parallelStream()
-                .filter((entry) -> usedControllers.contains(FileNameUtils.getAlphaNumericPath(entry.getValue())) && !entry.getKey().substring(1).startsWith(uri))
-                .collect(Collectors.toMap(e -> FileNameUtils.getAlphaNumericPath(e.getKey().substring(1)), e -> FileNameUtils.getAlphaNumericPath(e.getValue())));
+        return uriToControllerFiles(parsedRoute).entrySet().parallelStream()
+                .filter((entry) -> usedControllers.contains(entry.getValue()) && !entry.getKey().substring(1).startsWith(uri))
+                .collect(Collectors.groupingBy(e -> e.getValue(),
+                        Collectors.mapping(e -> FileNameUtils.getAlphaNumericPath(e.getKey().substring(1)), Collectors.toSet())));
     }
 
     public Set<String> getControllerFiles(List<String> controllers) {
@@ -40,6 +42,12 @@ public class ServiceSplitter {
 
     public List<String> getSortedUri() {
         return sortedUri;
+    }
+
+    private Map<String, String> uriToControllerFiles(LanguageParser parsedRoute) {
+        Map<String, String> uriToControllerFiles = new HashMap<>();
+        parsedRoute.getUriControllerAction().forEach((uri,controller) -> uriToControllerFiles.put(uri, FileNameUtils.getAlphaNumericPath(controller)));
+        return uriToControllerFiles;
     }
 
     private void addControllerToList(List<String> controllers, String controller, boolean shouldAdd) {

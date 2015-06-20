@@ -27,6 +27,10 @@ public class ProjectCopier {
         FileUtils.copyDirectory(new File(directory), newDir);
     }
 
+    public Set<String> getIncludeController() {
+        return includeController;
+    }
+
     public String getEndPointURI() {
         return endPointURI;
     }
