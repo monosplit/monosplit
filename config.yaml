@@ -3,3 +3,4 @@ copyFolderPrefix: ../app
 ipAddress: 0.0.0.0
 basePortNumber: 3000
 microServiceAmount: 8
+shellPath: /bin/bash

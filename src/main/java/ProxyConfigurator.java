@@ -14,9 +14,11 @@ public class ProxyConfigurator {
 
     private StringBuilder frontEndAddition = new StringBuilder();
     private StringBuilder backEndAddition = new StringBuilder();
+    private CommandRunner commandRunner;
 
-    ProxyConfigurator() throws IOException {
+    ProxyConfigurator(CommandRunner commandRunner) throws IOException {
         proxyContent = new String(Files.readAllBytes(Paths.get("haproxy.cfg")));
+        this.commandRunner = commandRunner;
     }
 
     public ProxyConfigurator addProjectToProxy(ProjectCopier projectCopier) {
@@ -32,8 +34,7 @@ public class ProxyConfigurator {
         processAdditions();
         FileUtils.writeStringToFile(Paths.get("generatedproxy.cfg").toFile(), proxyContent, "UTF-8");
         String commandContent = new String(Files.readAllBytes(Paths.get("proxydeploy.sh")));
-        CommandRunner commandRunner = new CommandRunner(commandContent);
-        commandRunner.runCommandLine(Paths.get("").toAbsolutePath().toString());
+        commandRunner.runCommandLine(Paths.get("").toAbsolutePath().toString(), commandContent);
     }
 
     private void processAdditions() {

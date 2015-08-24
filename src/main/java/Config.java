@@ -5,8 +5,17 @@ public class Config {
     private String projectPath;
     private String copyFolderPrefix;
     private String ipAddress;
+    private String shellPath;
     private Short basePortNumber;
     private Short microServiceAmount;
+
+    public String getShellPath() {
+        return shellPath;
+    }
+
+    public void setShellPath(String shellPath) {
+        this.shellPath = shellPath;
+    }
 
     public Short getMicroServiceAmount() {
         return microServiceAmount;

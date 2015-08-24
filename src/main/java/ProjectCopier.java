@@ -19,12 +19,15 @@ public class ProjectCopier {
     private String endPointURI;
     private Short port = 0;
     private Set<String> mandatoryFiles = new HashSet<>(Arrays.asList("application_controller.rb")); //Temporary, build it with Language Parser
+    private CommandRunner commandRunner;
 
-    ProjectCopier(String directory, String newSubDir, Set<String> includeController, boolean isRemainingServices) throws IOException {
+    ProjectCopier(String directory, String newSubDir, Set<String> includeController,
+            boolean isRemainingServices, CommandRunner commandRunner) throws IOException {
         this.includeController = includeController;
         newDir = new File(directory, newSubDir);
         this.isRemainingServices = isRemainingServices;
         FileUtils.copyDirectory(new File(directory), newDir);
+        this.commandRunner = commandRunner;
     }
 
     public Set<String> getIncludeController() {
@@ -70,8 +73,7 @@ public class ProjectCopier {
     public ProjectCopier runProjectCommand() throws IOException {
         String commandContent = new String(Files.readAllBytes(Paths.get("command.sh")));
         commandContent = replaceIPAndPort(commandContent);
-        CommandRunner commandRunner = new CommandRunner(commandContent);
-        commandRunner.runCommandLine(newDir.getAbsolutePath());
+        commandRunner.runCommandLine(newDir.getAbsolutePath(), commandContent);
         return this;
     }
 

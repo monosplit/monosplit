@@ -18,18 +18,19 @@ public class MonoSplit {
     public static void main(String[] args) throws IOException {
         MonoSplit monoSplit = new MonoSplit();
         Config projectConfig = monoSplit.setConfiguration(args[0]);
+        CommandRunner commandRunner = new CommandRunner(projectConfig.getShellPath());
 
         System.out.println("Running the command on " + projectConfig.getProjectPath());
         LanguageParser rails = new ParseRails(projectConfig.getProjectPath());
 
         ServiceSplitter serviceSplitter = new ServiceSplitter(rails);
 
-        List<ProjectCopier> mServices = monoSplit.splitServicesForTheGivenAmount(projectConfig.getMicroServiceAmount(), serviceSplitter, rails, projectConfig);
+        List<ProjectCopier> mServices = monoSplit.splitServicesForTheGivenAmount(projectConfig.getMicroServiceAmount(), serviceSplitter, rails, projectConfig, commandRunner);
 
         Set<String> allUsedControllers = monoSplit.completelyUsedControllers(mServices, serviceSplitter, rails);
-        mServices.add(monoSplit.configureDefaultService(projectConfig, allUsedControllers));
+        mServices.add(monoSplit.configureDefaultService(projectConfig, allUsedControllers, commandRunner));
 
-        ProxyConfigurator proxyConfigurator = new ProxyConfigurator();
+        ProxyConfigurator proxyConfigurator = new ProxyConfigurator(commandRunner);
         monoSplit.addAllServicesToProxy(proxyConfigurator, mServices);
 
         monoSplit.runAllMicroServices(mServices);
@@ -41,8 +42,8 @@ public class MonoSplit {
     }
 
 
-    public ProjectCopier configureDefaultService(Config projectConfig, Set<String> controllerFiles) throws IOException {
-        return new ProjectCopier(projectConfig.getProjectPath(), projectConfig.getCopyFolderPrefix() + "0", controllerFiles, true)
+    public ProjectCopier configureDefaultService(Config projectConfig, Set<String> controllerFiles, CommandRunner commandRunner) throws IOException {
+        return new ProjectCopier(projectConfig.getProjectPath(), projectConfig.getCopyFolderPrefix() + "0", controllerFiles, true, commandRunner)
                 .setIP(projectConfig.getIpAddress()).setPort(projectConfig.getBasePortNumber());
     }
 
@@ -79,8 +80,8 @@ public class MonoSplit {
         }
     }
 
-    public List<ProjectCopier> splitServicesForTheGivenAmount(short amount, ServiceSplitter serviceSplitter,
-                                               LanguageParser languageParser, Config projectConfig) throws IOException {
+    public List<ProjectCopier> splitServicesForTheGivenAmount(short amount, ServiceSplitter serviceSplitter, LanguageParser languageParser,
+            Config projectConfig, CommandRunner commandRunner) throws IOException {
         List<ProjectCopier> copiedServices = new ArrayList<>();
         for (short i = 0; i < amount; i++) {
             String uri = serviceSplitter.getSortedUri().get(i);
@@ -89,7 +90,7 @@ public class MonoSplit {
             Set<String> controllerFiles = serviceSplitter.getControllerFiles(controllers);
 
             copiedServices.add(new ProjectCopier(projectConfig.getProjectPath(), projectConfig.getCopyFolderPrefix() + String.valueOf(i + 1),
-                    controllerFiles, false).setIP(projectConfig.getIpAddress()).setPort((short) (projectConfig.getBasePortNumber() + i + 1))
+                    controllerFiles, false, commandRunner).setIP(projectConfig.getIpAddress()).setPort((short) (projectConfig.getBasePortNumber() + i + 1))
                     .setEndPoint(uri));
 
         }
