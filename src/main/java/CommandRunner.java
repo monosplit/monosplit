@@ -7,15 +7,15 @@ import java.util.List;
  */
 public class CommandRunner {
 
-    private String bashPath;
+    private String shellPath;
 
-    public CommandRunner(String bashPath) {
-        this.bashPath = bashPath;
+    public CommandRunner(String shellPath) {
+        this.shellPath = shellPath;
     }
 
     public void runCommandLine(String directory, String command) throws IOException {
         command = command == null ? "" : command;
-        ProcessBuilder processBuilder = new ProcessBuilder(bashPath);
+        ProcessBuilder processBuilder = new ProcessBuilder(shellPath);
         processBuilder.directory(new File(directory));
         Process process = processBuilder.start();
         try (OutputStreamWriter osw = new OutputStreamWriter(process.getOutputStream())) {
